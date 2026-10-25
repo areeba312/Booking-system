@@ -1,0 +1,579 @@
+{
+  "info": {
+    "name": "SRB API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "slotId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Create room (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roomCode\": \"ROOM-T1\",\n  \"name\": \"Test Room\",\n  \"building\": \"Library\",\n  \"seats\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rooms",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rooms"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 Create duplicate room (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roomCode\": \"ROOM-T1\",\n  \"name\": \"Test Room\",\n  \"building\": \"Library\",\n  \"seats\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rooms",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rooms"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 Change roomCode (422)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roomCode\": \"ROOM-X9\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rooms/ROOM-T1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rooms",
+            "ROOM-T1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 Create slot with 1 seat (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('slotId', pm.response.json()._id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roomCode\": \"ROOM-T1\",\n  \"date\": \"2026-12-01\",\n  \"startHour\": 8\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/slots",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "slots"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 List slots with filters (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/slots?roomCode=ROOM-T1&hasSeats=true&page=1&limit=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "slots"
+          ],
+          "query": [
+            {
+              "key": "roomCode",
+              "value": "ROOM-T1"
+            },
+            {
+              "key": "hasSeats",
+              "value": "true"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 Create student 1 (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"regNo\": \"FA23-BCS-901\",\n  \"name\": \"Test One\",\n  \"email\": \"test1@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 Create student 2 (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"regNo\": \"FA23-BCS-902\",\n  \"name\": \"Test Two\",\n  \"email\": \"test2@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students"
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 Get unknown student (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-999"
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 Book slot (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"slotId\": \"{{slotId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-901/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-901",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10 Book same slot again (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"slotId\": \"{{slotId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-901/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-901",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "11 Book full slot (409 SLOT_FULL)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 409', () => pm.response.to.have.status(409));",
+              "pm.test('code is SLOT_FULL', () => pm.expect(pm.response.json().error.code).to.eql('SLOT_FULL'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"slotId\": \"{{slotId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-902/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-902",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "12 List student bookings (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-901/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-901",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "13 Book invalid slotId (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"slotId\": \"abc\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-901/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-901",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "14 Cancel booking (204)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 204', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/FA23-BCS-901/bookings/{{slotId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "FA23-BCS-901",
+            "bookings",
+            "{{slotId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "15 Delete room (204)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 204', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/rooms/ROOM-T1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "rooms",
+            "ROOM-T1"
+          ]
+        }
+      }
+    }
+  ]
+}

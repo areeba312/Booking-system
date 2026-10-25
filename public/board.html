@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Room Board</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; padding: 0 12px; }
+    #status { font-weight: bold; }
+    .ok { color: green; } .bad { color: red; }
+    #announce { background: #fff3cd; padding: 8px; display: none; }
+    li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <h1 id="title"></h1>
+  <p>Status: <span id="status" class="bad">connecting...</span></p>
+  <p id="announce"></p>
+  <ul id="slots"></ul>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const roomCode = (new URLSearchParams(location.search).get('room') || 'ROOM-01').toUpperCase();
+    document.getElementById('title').textContent = roomCode;
+
+    const statusEl = document.getElementById('status');
+    const seatSpans = {};
+    const socket = io();
+
+    function render(slots) {
+      const ul = document.getElementById('slots');
+      ul.textContent = '';
+      for (const k in seatSpans) delete seatSpans[k];
+      slots.forEach((s) => {
+        const li = document.createElement('li');
+        const span = document.createElement('strong');
+        span.textContent = s.seats - s.booked;
+        seatSpans[s._id] = span;
+        li.append(s.date + '  ' + s.startHour + ':00 - seats left: ', span);
+        ul.appendChild(li);
+      });
+    }
+
+    // 'connect' har baar chalta hai (pehli dafa aur reconnect par bhi)
+    socket.on('connect', () => {
+      statusEl.textContent = 'connected';
+      statusEl.className = 'ok';
+      socket.emit('join:room', roomCode, (res) => {
+        if (res && res.ok) render(res.slots);
+      });
+    });
+    socket.on('disconnect', () => {
+      statusEl.textContent = 'disconnected';
+      statusEl.className = 'bad';
+    });
+    socket.on('slot:updated', ({ slotId, seatsLeft }) => {
+      if (seatSpans[slotId]) seatSpans[slotId].textContent = seatsLeft;
+    });
+    socket.on('announcement', ({ message }) => {
+      const el = document.getElementById('announce');
+      el.textContent = message; // textContent, innerHTML nahi
+      el.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

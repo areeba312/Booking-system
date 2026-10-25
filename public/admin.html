@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin</title>
+  <style>body{font-family:Arial,sans-serif;max-width:500px;margin:30px auto}.bad{color:red}.ok{color:green}</style>
+</head>
+<body>
+  <h1>Admin announcements</h1>
+  <input id="key" type="password" placeholder="Admin key">
+  <button id="connectBtn">Connect</button>
+  <p id="info"></p>
+  <input id="msg" placeholder="Announcement" size="40">
+  <button id="sendBtn" disabled>Announce</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const info = document.getElementById('info');
+    let socket;
+    document.getElementById('connectBtn').onclick = () => {
+      if (socket) socket.disconnect();
+      socket = io('/admin', { auth: { adminKey: document.getElementById('key').value }, reconnection: false });
+      socket.on('connect', () => {
+        info.textContent = 'Connected as admin'; info.className = 'ok';
+        document.getElementById('sendBtn').disabled = false;
+      });
+      socket.on('connect_error', (err) => {
+        info.textContent = 'Refused: ' + err.message; info.className = 'bad';
+        document.getElementById('sendBtn').disabled = true;
+      });
+    };
+    document.getElementById('sendBtn').onclick = () => {
+      const m = document.getElementById('msg').value.trim();
+      if (m && socket) socket.emit('announce', m);
+    };
+  </script>
+</body>
+</html>
